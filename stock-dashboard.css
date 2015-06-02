@@ -1,0 +1,14 @@
+body {
+    font-family: helvetica;
+}
+
+table, td, th {
+  border-collapse:collapse; 
+  border:0px;
+  padding:0px 2px 0px 2px;
+  margin:0px
+}
+
+#chartRow {
+    float: left;
+}

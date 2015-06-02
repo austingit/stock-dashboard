@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="stock-dashboard.js"></script>
+<link rel="stylesheet" type="text/css" href="stock-dashboard.css"></link>
+</head>
+
+<script type="text/javascript">
+
+function load_body() {
+//
+// example chart url
+// http://chart.finance.yahoo.com/z?s=%5eGSPC&t=5d&q=l&l=on&z=s&a=v&p=s,m50,ma200&lang=en-US&region=US
+//
+
+// stock symbols
+//var symbols = [encodeURIComponent("^RUT")];
+var symbols = decodeURIComponent(getQueryParamByName("symbols")).replace(/\+/g, '').split(",");
+if (symbols == 'undefined' || symbols == "" || symbols.length == 0) {
+     symbols = ["^RUT",
+               "^GSPC",
+               "^IXIC",
+               "^DJI",
+//			   "DIA",
+               "^NYA",
+               "^TNX"
+               ];
+}
+
+
+// set chart dimensions
+var zoom = 85;
+var chartWidth = 350*zoom/100;
+var chartHeight = 275*zoom/100;
+
+// global chart properties
+var globalChartProperties = {"q" : "l",    	// ??
+							 "l" : "on",   	// display log
+							 "z" : "s",    	// chart size
+							 "a" : "v",    	// display volume
+							 "p" : "s",		// default p
+							 "lang" : "en-US",
+							 "region" : "US"};
+
+
+
+// default yahoo finance chart URL
+var baseURL = "http://chart.finance.yahoo.com/z?";
+
+// hash of possible chart dimensions
+var chartDurations = {"1d" : "1 Day",
+                      "5d" : "5 Days",
+                      "1m" : "1 Month",
+                      "3m" : "3 Months",
+                      "6m" : "6 Months",
+                      "1y" : "1 Year",
+                      "2y" : "2 Years",
+                      "5y" : "5 Years",
+                      "my" : "Max"};
+
+
+
+// set default chartColumnProperties
+var chartColumnProperties = [ { "t" : "1d", "ma1" : "", "ma2" : "" },
+						      { "t" : "5d", "ma1" : "", "ma2" : "" },
+						      { "t" : "3m", "ma1" : "", "ma2" : "" },
+						      { "t" : "5y", "ma1" : "", "ma2" : "" }
+                            ];
+
+
+
+// try to set t and ma arrays from query params (regardless if it has them
+// e.g. if the users submitted the form.
+var tArray = getQueryParamByName("t");
+var ma1Array = getQueryParamByName("ma1");
+var ma2Array = getQueryParamByName("ma2");
+
+// set the chartColumnProperties with the values from the query string
+// TODO - should check that the array length equals the chartColumnProperties length
+for (var i = 0; tArray != null && i < tArray.length; i++) {
+	chartColumnProperties[i].t = tArray[i];
+}
+
+for (var x = 0; ma1Array != null && ma2Array != null && x < ma1Array.length; x++) {
+		
+		// moving average looks crappy if there aren't enough units
+		if (tArray[x] == "1m") {
+			chartColumnProperties[x].ma1 = ma1Array[x] != "off" ? "m7":"";
+			chartColumnProperties[x].ma2 = ma2Array[x] != "off" ? "m30":"";
+		} else if (tArray[x] == "3m") {
+			chartColumnProperties[x].ma1 = ma1Array[x] != "off" ? "m30":"";
+			chartColumnProperties[x].ma2 = ma2Array[x] != "off" ? "m90":"";
+		} else if (tArray[x] == "6m") {
+			chartColumnProperties[x].ma1 = ma1Array[x] != "off" ? "m50":"";
+			chartColumnProperties[x].ma2 = ma2Array[x] != "off" ? "m180":"";
+		} else {
+			chartColumnProperties[x].ma1 = ma1Array[x] != "off" ? "m50":"";
+			chartColumnProperties[x].ma2 = ma2Array[x] != "off" ? "m200":"";
+		}
+}
+
+
+
+
+
+
+// create main form
+var form = document.createElement("form");
+form.setAttribute('action','index.html');
+form.setAttribute('method','get');
+document.body.appendChild(form);
+
+//create symbol input box
+var symbolInput = createSymbolInput(symbols, chartWidth + (chartWidth * chartColumnProperties.length));
+form.appendChild(symbolInput);
+
+// create sticky header
+var stickyHeader = createStickyHeader(chartDurations, chartColumnProperties, chartWidth);
+form.appendChild(stickyHeader);
+
+
+// create rows
+var dataRows = createDataRows(baseURL, symbols, globalChartProperties, chartDurations, chartColumnProperties, chartWidth, chartHeight);
+document.body.appendChild(dataRows);
+
+}
+
+</script>
+
+<body onload="load_body()">
+</body>
+</html>
