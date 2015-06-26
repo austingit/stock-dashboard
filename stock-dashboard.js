@@ -161,11 +161,15 @@ function createStickyHeader(chartDurations, chartColumnProperties, chartWidth) {
 function createDataRows(baseURL, symbols, globalChartProperties, chartDurations, chartColumnProperties, chartWidth, chartHeight) {
 
   var div = document.createElement("div");
+  //div.style.clear = "both";
+  
   var dataDivs = new Array();
-  div.style.clear = "both";
   
   var symbolData = new Array();
   for (var s = 0;  s < symbols.length; s++) {
+
+    var rowDiv = document.createElement("div");
+    rowDiv.style.overflow = "hidden";
 
     dataDivs[s] = document.createElement("div");
     dataDivs[s].style.width = chartWidth + "px";
@@ -186,13 +190,15 @@ function createDataRows(baseURL, symbols, globalChartProperties, chartDurations,
         });
     })();
 
-    div.appendChild(dataDivs[s]);
+    rowDiv.appendChild(dataDivs[s]);
 
 	// create chart URL and img element
-    div.appendChild(createRowCharts(baseURL, symbols[s], globalChartProperties, chartColumnProperties, chartWidth, chartHeight));
+    rowDiv.appendChild(createRowCharts(baseURL, symbols[s], globalChartProperties, chartColumnProperties, chartWidth, chartHeight));
 
+    div.appendChild(rowDiv);
   }
   return div;
+
 }
 
 function getSymbolDataDiv(symbol, chartWidth, dataDiv, callback) {
@@ -278,6 +284,8 @@ function createRowCharts(baseURL, symbol, globalChartProperties, chartColumnProp
     
     var div = document.createElement("div");
     div.id = "chartRow";
+    div.style.float = "none";
+    div.style.whiteSpace = "nowrap";
 
     for (var t = 0; t < chartColumnProperties.length; t++) {
         
