@@ -24,7 +24,7 @@ function getQueryParamByName(name) {
 }
 
 //function toggleCheckBox(checkbox,hiddenCheckBox) {
-function toggleCheckBox(checkbox) {
+function toggleCheckBox(checkbox, submit) {
     	//document.getElementById(hiddenCheckBox).setAttribute('value', document.getElementById(checkbox).checked? "":"off");
     	
     if (!checkbox.checked) {
@@ -40,6 +40,12 @@ function toggleCheckBox(checkbox) {
 			element.parentNode.removeChild(element);
 		}
 	}
+    
+    console.log(submit);
+    if (submit) {
+        document.getElementById("stockForm").submit();
+    }
+    
 }
 
 function getSymbolData(url, callback) {
@@ -94,7 +100,7 @@ function createStickyHeader(chartDurations, chartColumnProperties, chartWidth) {
   
 	var select = document.createElement("select");
 	select.setAttribute('name', "t");
-	for (key in chartDurations) {
+    for (key in chartDurations) {
 		var option = document.createElement("option");
 		option.value = key;
 		option.text = chartDurations[key];
@@ -103,7 +109,9 @@ function createStickyHeader(chartDurations, chartColumnProperties, chartWidth) {
 	col.appendChild(select);
 	// this is not guaranteed because the json object isn't guaranteed to return the same order???
 	col.childNodes[0].selectedIndex = Object.keys(chartDurations).indexOf(chartColumnProperties[t].t);
-		
+    // onChange doesn't seem to be triggered by setting the selectedIndex above, but let's set it
+    // afterwards just in case.
+    select.setAttribute('onChange', "submit()");
 											
 	var ma1 = document.createElement("input");
     col.appendChild(ma1);
@@ -116,7 +124,7 @@ function createStickyHeader(chartDurations, chartColumnProperties, chartWidth) {
 		ma1.checked = false;
 		toggleCheckBox(ma1);
 	}
-	ma1.setAttribute ('onClick', "toggleCheckBox(" + ma1.id + ")");
+	ma1.setAttribute ('onClick', "toggleCheckBox(" + ma1.id + ",true)");
 
     
     var span = document.createElement("span");
@@ -134,21 +142,21 @@ function createStickyHeader(chartDurations, chartColumnProperties, chartWidth) {
 		ma2.checked = false;
 		toggleCheckBox(ma2);
 	}
-	ma2.setAttribute ('onClick', "toggleCheckBox(" + ma2.id + ")");
+	ma2.setAttribute ('onClick', "toggleCheckBox(" + ma2.id + ", true)");
     
     var span = document.createElement("span");
     span.innerHTML = "ma2&nbsp;&nbsp;&nbsp;";
     col.appendChild(span)
 	
-	var reloadButton = document.createElement("input");
-	reloadButton.type = "submit";
-	reloadButton.value = "";
-	reloadButton.style.background = "url(button_reload_sm.png) no-repeat";
-	reloadButton.style.border = "none";
-	reloadButton.style.width = "20px";
-	reloadButton.style.height = "20px";
-	reloadButton.style.padding = "6px";
-	col.appendChild(reloadButton);
+	//var reloadButton = document.createElement("input");
+	//reloadButton.type = "submit";
+	//reloadButton.value = "";
+	//reloadButton.style.background = "url(button_reload_sm.png) no-repeat";
+	//reloadButton.style.border = "none";
+	//reloadButton.style.width = "20px";
+	//reloadButton.style.height = "20px";
+	//reloadButton.style.padding = "6px";
+	//col.appendChild(reloadButton);
 
     div.appendChild(col); 
 
